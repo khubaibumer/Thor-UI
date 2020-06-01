@@ -142,25 +142,30 @@ public class ConnectUI extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
-        SessionInfo session = new SessionInfo();
-
         if (jTextField1.getText().isEmpty() || jTextField2.getText().isEmpty()) {
             JOptionPane.showMessageDialog(new JFrame(), "Server Ip/Port cannot be Empty", "Fatal",
                     JOptionPane.ERROR_MESSAGE);
-            session.ip = "";
-            session.port = -1;
-            jTextField1.setText("");
-            jTextField2.setText("");
+            return;
+//            session.ip = "";
+//            session.port = -1;
+//            jTextField1.setText("");
+//            jTextField2.setText("");
 
         } else {
-            session.ip = jTextField1.getText().trim();
-            session.port = Integer.parseInt(jTextField2.getText().trim());
-            session.id = jTextField4.getText().trim();
-            session.pass = jPasswordField1.getText().trim();
+            String ip = jTextField1.getText().trim();
+            int port = Integer.parseInt(jTextField2.getText().trim());
+            String id = jTextField4.getText().trim();
+            String pass = new String (jPasswordField1.getPassword()).trim();
+
+            SessionInfo session = new SessionInfo(ip, port, id, pass);
+            session.setSession(session);
+
             if (NetworkUtils.getInstance().connectServer(session) == true) {
                 //TODO: Load next Screen
                 JOptionPane.showMessageDialog(new JFrame(), "Server Connected Successfuly", "Success",
                         JOptionPane.INFORMATION_MESSAGE);
+                new AdminPanel().setVisible(true);
+                this.dispose();
             } else {
                 //TODO: Load next Screen
                 JOptionPane.showMessageDialog(new JFrame(), "Server Connection Failed", "Invalid Credentials",
@@ -168,7 +173,6 @@ public class ConnectUI extends javax.swing.JFrame {
             }
 
         }
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

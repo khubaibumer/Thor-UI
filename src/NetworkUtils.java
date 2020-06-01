@@ -1,6 +1,7 @@
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -36,8 +37,8 @@ public class NetworkUtils {
     private SSLSocketFactory factory;
     private SSLSocket socket;
     private SSLContext sc;
-    private BufferedReader in;
-    private PrintWriter out;
+    private static BufferedReader in;
+    private static PrintWriter out;
 
     public NetworkUtils() {
         factory = null;
@@ -78,15 +79,57 @@ public class NetworkUtils {
         }
     };
 
-    public boolean connectServer(SessionInfo session) {
+    public void closeServer() throws IOException {
+
+        in.close();
+        out.close();
+        instance = new NetworkUtils();
+    }
+
+    public boolean sendToServer(String msg) throws IOException {
+        if (!msg.isEmpty() && out != null) {
+            if (!out.checkError()) {
+                out.println(msg);
+                out.println();
+                out.flush();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean validateUser(String input) {
+        if (input.equals(SessionInfo.getSession().pass)) {
+            return true;
+        }
+        return false;
+    }
+
+    public String recvFromServer() throws IOException {
+        if (in != null) {
+            return in.readLine();
+        } else {
+            return "";
+        }
+    }
+
+    public boolean connectServer(SessionInfo _session) {
 
         boolean kicked = false;
         String input = "";
         try {
             factory = sc.getSocketFactory();
+
+            SessionInfo session = SessionInfo.getSession();
+
             socket
                     = (SSLSocket) factory.createSocket(session.ip, session.port);
             socket.startHandshake();
+
+            out = new PrintWriter(
+                    new BufferedWriter(
+                            new OutputStreamWriter(
+                                    socket.getOutputStream())));
 
             /* read response */
             in = new BufferedReader(
@@ -94,17 +137,26 @@ public class NetworkUtils {
                             socket.getInputStream()));
 
             String inputLine;
-            inputLine = in.readLine();
+//            inputLine = in.readLine();
+            inputLine = this.recvFromServer();
 
-            out = new PrintWriter(
-                    new BufferedWriter(
-                            new OutputStreamWriter(
-                                    socket.getOutputStream())));
-
-            String msg = session.id + "," + session.pass;
-            out.println(msg);
-            out.println();
-            out.flush();
+            if (inputLine.contains("Enter Credentials:")) {
+                String msg = session.id + "," + session.pass;
+                this.sendToServer(msg);
+//                out.println(msg);
+//                out.println();
+//                out.flush();
+            } else {
+                kicked = true;
+            }
+//            inputLine = in.readLine();
+            inputLine = this.recvFromServer();
+            input += inputLine;
+            if (inputLine.contains("Welcome")) {
+                kicked = false;
+            } else if (inputLine.contains("kicked")) {
+                kicked = true;
+            }
 
             /*
              * Make sure there were no surprises
@@ -114,17 +166,6 @@ public class NetworkUtils {
                         "SSLSocketClient: java.io.PrintWriter error");
             }
 
-            inputLine = "";
-            while (in.ready()) {
-                inputLine = in.readLine();
-                input += inputLine;
-                if (inputLine.contains("Welcome")) {
-                    kicked = false;
-                } else if (inputLine.contains("kicked")) {
-                    kicked = true;
-                }
-            }
-
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), e.getLocalizedMessage(), "Fatal Exception",
                     JOptionPane.ERROR_MESSAGE);
@@ -132,23 +173,21 @@ public class NetworkUtils {
 
         }
 
-        JOptionPane optionPane = new NarrowOptionPane();
-        optionPane.setMessage(input);
-        optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
-        JDialog dialog = optionPane.createDialog(null, "Width 100");
-        dialog.setVisible(true);
-//        JOptionPane.showMessageDialog(new JFrame(), input, "Response",
-//                JOptionPane.INFORMATION_MESSAGE);
+//        JOptionPane optionPane = new NarrowOptionPane();
+//        optionPane.setMessage(input);
+//        optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
+//        JDialog dialog = optionPane.createDialog(null, "Credentaial Validation");
+//        dialog.setVisible(true);
         return !kicked;
     }
 }
 
 class NarrowOptionPane extends JOptionPane {
 
-  NarrowOptionPane() {
-  }
+    NarrowOptionPane() {
+    }
 
-  public int getMaxCharactersPerLineCount() {
-    return 100;
-  }
+    public int getMaxCharactersPerLineCount() {
+        return 100;
+    }
 }
