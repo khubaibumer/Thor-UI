@@ -155,11 +155,11 @@ public class AdminPanel extends javax.swing.JFrame {
 
         JPanel panel = new JPanel();
         JLabel lName = new JLabel("Enter User Name: ");
-        JTextField tName = new JTextField(50);
+        JTextField tName = new JTextField(20);
         panel.add(lName);
         panel.add(tName);
         JLabel label = new JLabel("Enter a password:");
-        JPasswordField pass = new JPasswordField(50);
+        JPasswordField pass = new JPasswordField(20);
         panel.add(label);
         panel.add(pass);
         String[] options = new String[]{"OK", "Cancel"};
@@ -174,9 +174,14 @@ public class AdminPanel extends javax.swing.JFrame {
                 String adminPassword = new String(pf.getPassword());
                 if (NetworkUtils.getInstance().validateUser(adminPassword)) {
                     String userName = tName.getText();
-                    JOptionPane.showMessageDialog(new JFrame(), "User " + userName + " Successfully Added", "Success",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    RPCInterface.getInstance().addUser(userName, userName, "", "");
+                    String userPsswd = new String(pass.getPassword());
+                    if (RPCInterface.getInstance().addUser(userName, userPsswd, "", "")) {
+                        JOptionPane.showMessageDialog(new JFrame(), "User " + userName + " Successfully Added", "Success",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(new JFrame(), "User " + userName + " Cannot be Added", "Request Declined by Server",
+                                JOptionPane.ERROR_MESSAGE);                    
+                    }
                 } else {
                     JOptionPane.showMessageDialog(new JFrame(), "User Validation Failure", "Invalid Credentails",
                             JOptionPane.ERROR_MESSAGE);

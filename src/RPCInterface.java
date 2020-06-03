@@ -10,17 +10,20 @@
  */
 public class RPCInterface {
 
-    private final String ADD = "ADDREQ,";
-    private final String DEL = "DELREQ,";
+    private final String REQ = "REQ,";
+    private final String USR = "USER,";
     private final String OK = "RESP,OK,200";
-    private final String UPDATE = "UPDATEREQ,";
-    
+    private final String ADDUSR = REQ + "DBADD," + USR;
+    private final String DELUSR = REQ + "DBDEL," + USR;
+    private final String UPDATEUSR = REQ + "DBUPDATE," + USR;
+
     private static RPCInterface instance = null;
-    
+
     public static RPCInterface getInstance() {
-        if(instance == null)
+        if (instance == null) {
             instance = new RPCInterface();
-        
+        }
+
         return instance;
     }
 
@@ -33,12 +36,11 @@ public class RPCInterface {
     protected boolean addUser(String user, String pass, String mode, String info) {
 
         boolean ret = false;
-        String req = ADD + user + "," + pass + "," + mode + "," + info;
+        String req = ADDUSR + user + "," + pass + "," + mode + "," + info;
         try {
-            for(int i = 0; i < 20; i++)
-                NetworkUtils.getInstance().sendToServer(req);
+            NetworkUtils.getInstance().sendToServer(req);
             String response = NetworkUtils.getInstance().recvFromServer();
-            if (response.equals(OK + "\n")) {
+            if (response.contains(OK)) {
                 ret = true;
             }
         } catch (Exception e) {
@@ -51,11 +53,11 @@ public class RPCInterface {
     protected boolean deleteUserInfo(String user, String pass) {
 
         boolean ret = false;
-        String req = DEL + user + "," + pass + "\n";
+        String req = DELUSR + user + "," + pass + "\n";
         try {
             NetworkUtils.getInstance().sendToServer(req);
             String response = NetworkUtils.getInstance().recvFromServer();
-            if (response.equals(OK + "\n")) {
+            if (response.contains(OK)) {
                 ret = true;
             }
         } catch (Exception e) {
@@ -68,7 +70,7 @@ public class RPCInterface {
     protected boolean updateUserInfo(String user, String key, KEYTYPE keyType) {
 
         boolean ret = false;
-        String req = UPDATE;
+        String req = UPDATEUSR;
         switch (keyType) {
             case PASSWD: {
                 req += KEYTYPE.PASSWD + "," + key;
@@ -89,7 +91,7 @@ public class RPCInterface {
         try {
             NetworkUtils.getInstance().sendToServer(req);
             String response = NetworkUtils.getInstance().recvFromServer();
-            if (response.equals(OK + "\n")) {
+            if (response.contains(OK)) {
                 ret = true;
             }
         } catch (Exception e) {

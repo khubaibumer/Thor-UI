@@ -20,7 +20,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import sun.rmi.runtime.Log;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
