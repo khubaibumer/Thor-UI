@@ -10,6 +10,10 @@
  */
 public class SessionInfo {
 
+    public static final int ADMIN = 0;
+    public static final int MERCHAT = 1000;
+    public static final int USER = 2000;
+    
     public String ip;
     public int port;
     public String id;

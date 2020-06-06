@@ -1,4 +1,6 @@
 
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -80,6 +82,11 @@ public class AdminPanel extends javax.swing.JFrame {
         });
 
         changeUsrInfoBtn.setText("Change User Information");
+        changeUsrInfoBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                changeUsrInfoBtnActionPerformed(evt);
+            }
+        });
 
         updateSelfInfoBtn.setText("Update My Information");
 
@@ -140,7 +147,7 @@ public class AdminPanel extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // Logout From Server
         try {
-            NetworkUtils.getInstance().sendToServer("BYE!");
+            NetworkUtils.getInstance().sendToServer("bye");
             NetworkUtils.getInstance().closeServer();
             new ConnectUI().setVisible(true);
             this.dispose();
@@ -154,14 +161,26 @@ public class AdminPanel extends javax.swing.JFrame {
         // Add a New User Account in Server
 
         JPanel panel = new JPanel();
-        JLabel lName = new JLabel("Enter User Name: ");
-        JTextField tName = new JTextField(20);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JLabel lName = new JLabel("Enter User Name");
+        JTextField tName = new JTextField(30);
         panel.add(lName);
         panel.add(tName);
-        JLabel label = new JLabel("Enter a password:");
-        JPasswordField pass = new JPasswordField(20);
+        JLabel label = new JLabel("Enter a password");
+        JPasswordField pass = new JPasswordField(30);
         panel.add(label);
         panel.add(pass);
+        JLabel lMode = new JLabel("Select User Mode");
+        String[] userModes = {"---", "Admin", "Merchant", "Checkout"};
+        final JComboBox<String> cb = new JComboBox<>(userModes);
+        panel.add(lMode);
+        cb.setVisible(true);
+        panel.add(cb);
+        JLabel lInfo = new JLabel("Additional Information");
+        JTextField tInfo = new JTextField(30);
+        panel.add(lInfo);
+        panel.add(tInfo);
+
         String[] options = new String[]{"OK", "Cancel"};
         int option = JOptionPane.showOptionDialog(null, panel, "Enter User Password",
                 JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
@@ -175,12 +194,14 @@ public class AdminPanel extends javax.swing.JFrame {
                 if (NetworkUtils.getInstance().validateUser(adminPassword)) {
                     String userName = tName.getText();
                     String userPsswd = new String(pass.getPassword());
-                    if (RPCInterface.getInstance().addUser(userName, userPsswd, "", "")) {
+                    String addInfo = tInfo.getText().trim();
+                    String mod = (String) cb.getSelectedItem();
+                    if (RPCInterface.getInstance().addUser(userName, userPsswd, mod, addInfo)) {
                         JOptionPane.showMessageDialog(new JFrame(), "User " + userName + " Successfully Added", "Success",
                                 JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(new JFrame(), "User " + userName + " Cannot be Added", "Request Declined by Server",
-                                JOptionPane.ERROR_MESSAGE);                    
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
                     JOptionPane.showMessageDialog(new JFrame(), "User Validation Failure", "Invalid Credentails",
@@ -194,6 +215,10 @@ public class AdminPanel extends javax.swing.JFrame {
     private void usrInfoUpdateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usrInfoUpdateBtnActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_usrInfoUpdateBtnActionPerformed
+
+    private void changeUsrInfoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeUsrInfoBtnActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_changeUsrInfoBtnActionPerformed
 
 //    /**
 //     * @param args the command line arguments

@@ -112,10 +112,10 @@ public class NetworkUtils {
         }
     }
 
-    public boolean connectServer(SessionInfo _session) {
+    public int connectServer(SessionInfo _session) {
 
-        boolean kicked = false;
         String input = "";
+        int userMode = -1;
         try {
             factory = sc.getSocketFactory();
 
@@ -136,25 +136,24 @@ public class NetworkUtils {
                             socket.getInputStream()));
 
             String inputLine;
-//            inputLine = in.readLine();
             inputLine = this.recvFromServer();
 
-            if (inputLine.contains("Enter Credentials:")) {
-                String msg = session.id + "," + session.pass;
+            if (inputLine.contains("auth,who")) {
+                String msg = "auth," + session.id + "," + session.pass;
                 this.sendToServer(msg);
-//                out.println(msg);
-//                out.println();
-//                out.flush();
             } else {
-                kicked = true;
+                throw new IOException("Invalid response: " + inputLine);
             }
-//            inputLine = in.readLine();
             inputLine = this.recvFromServer();
             input += inputLine;
-            if (inputLine.contains("Welcome")) {
-                kicked = false;
-            } else if (inputLine.contains("kicked")) {
-                kicked = true;
+            if (inputLine.contains("auth,ok,")) {
+                
+                userMode = Integer.parseInt((inputLine.split(","))[2]);
+                
+                String[] resCode = inputLine.split(",");
+                userMode = Integer.parseInt(resCode[2]);
+            } else if (inputLine.contains("auth,fail,-1")) {
+                userMode = -1;
             }
 
             /*
@@ -168,16 +167,10 @@ public class NetworkUtils {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), e.getLocalizedMessage(), "Fatal Exception",
                     JOptionPane.ERROR_MESSAGE);
-            return false;
+            return userMode;
 
         }
-
-//        JOptionPane optionPane = new NarrowOptionPane();
-//        optionPane.setMessage(input);
-//        optionPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
-//        JDialog dialog = optionPane.createDialog(null, "Credentaial Validation");
-//        dialog.setVisible(true);
-        return !kicked;
+        return userMode;
     }
 }
 

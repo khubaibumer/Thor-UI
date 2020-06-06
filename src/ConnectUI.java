@@ -155,21 +155,35 @@ public class ConnectUI extends javax.swing.JFrame {
             String ip = jTextField1.getText().trim();
             int port = Integer.parseInt(jTextField2.getText().trim());
             String id = jTextField4.getText().trim();
-            String pass = new String (jPasswordField1.getPassword()).trim();
+            String pass = new String(jPasswordField1.getPassword()).trim();
 
             SessionInfo session = new SessionInfo(ip, port, id, pass);
             session.setSession(session);
 
-            if (NetworkUtils.getInstance().connectServer(session) == true) {
-                //TODO: Load next Screen
-                JOptionPane.showMessageDialog(new JFrame(), "Server Connected Successfuly", "Success",
-                        JOptionPane.INFORMATION_MESSAGE);
-                new AdminPanel().setVisible(true);
-                this.dispose();
-            } else {
-                //TODO: Load next Screen
-                JOptionPane.showMessageDialog(new JFrame(), "Server Connection Failed", "Invalid Credentials",
-                        JOptionPane.ERROR_MESSAGE);
+            int userMode = NetworkUtils.getInstance().connectServer(session);
+            switch (userMode) {
+                case SessionInfo.ADMIN:
+                    JOptionPane.showMessageDialog(new JFrame(), "Server Connected Successfuly as Administrator", "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    new AdminPanel().setVisible(true);
+                    this.dispose();
+                    break;
+                case SessionInfo.MERCHAT:
+                    // TODO: Open Merchant Screen
+                    JOptionPane.showMessageDialog(new JFrame(), "Server Connected Successfuly as Merchant", "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                case SessionInfo.USER:
+                    //TODO: Open Default User Screen
+                    JOptionPane.showMessageDialog(new JFrame(), "Server Connected Successfuly as Default User", "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(new JFrame(), "Server Connection Failed", "Invalid Credentials",
+                            JOptionPane.ERROR_MESSAGE);
+                    jTextField4.setText("");
+                    jPasswordField1.setText("");
+                    break;
             }
 
         }
