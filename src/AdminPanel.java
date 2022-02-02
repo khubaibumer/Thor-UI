@@ -213,11 +213,11 @@ public class AdminPanel extends javax.swing.JFrame {
     }//GEN-LAST:event_usrAddBtnActionPerformed
 
     private void usrInfoUpdateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_usrInfoUpdateBtnActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_usrInfoUpdateBtnActionPerformed
 
     private void changeUsrInfoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeUsrInfoBtnActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_changeUsrInfoBtnActionPerformed
 
 //    /**
