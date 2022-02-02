@@ -169,12 +169,10 @@ public class ConnectUI extends javax.swing.JFrame {
                     this.dispose();
                     break;
                 case SessionInfo.MERCHAT:
-                    // TODO: Open Merchant Screen
                     JOptionPane.showMessageDialog(new JFrame(), "Server Connected Successfuly as Merchant", "Success",
                             JOptionPane.INFORMATION_MESSAGE);
                     break;
                 case SessionInfo.USER:
-                    //TODO: Open Default User Screen
                     JOptionPane.showMessageDialog(new JFrame(), "Server Connected Successfuly as Default User", "Success",
                             JOptionPane.INFORMATION_MESSAGE);
                     break;
